@@ -20,7 +20,11 @@ function copyDir(src, dest) {
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     const s = path.join(src, entry.name)
     const d = path.join(dest, entry.name)
-    if (entry.isDirectory()) copyDir(s, d)
+    // On Windows, Turbopack may create junctions (ReparsePoint) for node_modules.
+    // withFileTypes + lstat both report them as symlinks, not directories.
+    // statSync follows the junction and correctly identifies the target type.
+    const isDir = entry.isDirectory() || fs.statSync(s).isDirectory()
+    if (isDir) copyDir(s, d)
     else fs.copyFileSync(s, d)
   }
 }
@@ -35,7 +39,7 @@ copyDir(STATIC,    path.join(DEST, 'standalone', '.next', 'static'))
 copyDir(PUBLIC,    path.join(DEST, 'standalone', 'public'))
 copyDir(MIGRATIONS, path.join(DEST, 'standalone', 'lib', 'db', 'migrations'))
 
-// Keep a .gitkeep so the empty dir is tracked
-fs.writeFileSync(path.join(DEST, '.gitkeep'), '')
+// README.txt is required by tauri.conf.json "resources" so cargo check passes
+fs.writeFileSync(path.join(DEST, 'README.txt'), 'Jungle Gym Play House — Next.js server bundle\n')
 
 console.log('✓ src-tauri/resources/ ready for Tauri bundle')
