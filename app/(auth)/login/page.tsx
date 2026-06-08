@@ -27,8 +27,9 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
         <div className="text-center mb-8">
-          <div className="text-4xl mb-2">🎪</div>
-          <h1 className="text-2xl font-bold text-gray-900">PlayNest</h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Jungle Gym Play House" className="h-16 w-16 object-contain mx-auto mb-2" />
+          <h1 className="text-2xl font-bold text-gray-900">Jungle Gym Play House</h1>
           <p className="text-gray-500 text-sm mt-1">Staff Portal</p>
         </div>
 

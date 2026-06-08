@@ -1,5 +1,5 @@
 {
-  "productName": "PlayNest",
+  "productName": "Jungle Gym Play House",
   "version": "0.1.0",
   "identifier": "com.playnest.pos",
   "build": {
@@ -11,7 +11,7 @@
   "app": {
     "windows": [
       {
-        "title": "PlayNest POS",
+        "title": "Jungle Gym Play House POS",
         "width": 1280,
         "height": 800,
         "minWidth": 1024,

@@ -13,7 +13,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-6 sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-2 font-bold text-gray-900 text-lg">
-          <span>🎪</span> PlayNest
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Jungle Gym Play House" className="h-8 w-8 object-contain" />
+          Jungle Gym Play House
         </div>
         <nav className="flex items-center gap-1 flex-1">
           <Link href="/pos" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
