@@ -1,0 +1,51 @@
+import { auth } from '@/lib/config/auth'
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import { SignOutButton } from '@/components/shared/SignOutButton'
+
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth()
+  if (!session) redirect('/login')
+
+  const isAdmin = session.user.role === 'ADMIN'
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-6 sticky top-0 z-10 shadow-sm">
+        <div className="flex items-center gap-2 font-bold text-gray-900 text-lg">
+          <span>🎪</span> PlayNest
+        </div>
+        <nav className="flex items-center gap-1 flex-1">
+          <Link href="/pos" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+            POS
+          </Link>
+          {isAdmin && (
+            <>
+              <Link href="/admin" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+                Dashboard
+              </Link>
+              <Link href="/admin/reports" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+                Reports
+              </Link>
+              <Link href="/admin/customers" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+                Customers
+              </Link>
+              <Link href="/admin/rates" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+                Rates
+              </Link>
+              <Link href="/admin/staff" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+                Staff
+              </Link>
+            </>
+          )}
+        </nav>
+        <div className="flex items-center gap-3 text-sm">
+          <span className="text-gray-500">{session.user.name}</span>
+          <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">{session.user.role}</span>
+          <SignOutButton />
+        </div>
+      </header>
+      <main className="flex-1 p-6">{children}</main>
+    </div>
+  )
+}

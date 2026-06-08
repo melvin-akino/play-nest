@@ -1,0 +1,15 @@
+# Local development — runs only the libSQL server
+# Next.js runs via `npm run dev` on the host (hot reload)
+services:
+  db:
+    image: ghcr.io/tursodatabase/libsql-server:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - libsql_data:/var/lib/sqld
+    environment:
+      SQLD_NODE: primary
+    restart: unless-stopped
+
+volumes:
+  libsql_data:

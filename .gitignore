@@ -38,4 +38,17 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# tauri
+/src-tauri/target/
+/src-tauri/resources/standalone/
+/src-tauri/icons/android/
+/src-tauri/icons/ios/
+/src-tauri/icons/AppIcon*.png
+/src-tauri/icons/Square*.png
+/src-tauri/icons/StoreLogo.png
+/src-tauri/gen/
+
+# drizzle
+/lib/db/migrations/meta/
 next-env.d.ts
