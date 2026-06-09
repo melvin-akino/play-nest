@@ -50,5 +50,5 @@ yarn-error.log*
 /src-tauri/gen/
 
 # drizzle
-/lib/db/migrations/meta/
+# (meta/ is intentionally tracked — needed by drizzle migrator at runtime)
 next-env.d.ts
