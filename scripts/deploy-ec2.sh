@@ -38,9 +38,9 @@ if [[ -z "$NEXTAUTH_SECRET" ]]; then
   NEXTAUTH_SECRET=$(openssl rand -base64 32)
   warn "Auto-generated NEXTAUTH_SECRET — save this: $NEXTAUTH_SECRET"
 fi
-if [[ -z "$USE_SSL" || "$USE_SSL" == "no" ]]; then
+if [[ -z "$USE_SSL" ]]; then
   read -rp "Enable Let's Encrypt SSL? Requires a real domain pointed at this IP [y/N]: " ans
-  [[ "$ans" =~ ^[Yy]$ ]] && USE_SSL="yes"
+  [[ "$ans" =~ ^[Yy]$ ]] && USE_SSL="yes" || USE_SSL="no"
 fi
 
 # ── 1. System update ──────────────────────────────────────────────────────────
