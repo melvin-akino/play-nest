@@ -26,7 +26,7 @@ export function usePrintReceipt() {
       </head><body>
       <div style="padding:4mm;width:72mm">
         <div style="text-align:center;margin-bottom:8px">
-          <div style="font-size:18px;font-weight:bold">PlayNest</div>
+          <div style="font-size:18px;font-weight:bold">Jungle Gym Play House</div>
           <div style="font-size:11px">Official Receipt</div>
           <hr style="margin:6px 0"/>
         </div>
@@ -45,7 +45,7 @@ export function usePrintReceipt() {
         <hr style="margin:8px 0"/>
         <div style="font-size:10px;text-align:center">
           Served by: ${props.staffName}<br/>
-          Thank you for visiting PlayNest!
+          Thank you for visiting Jungle Gym Play House!
         </div>
       </div>
       </body></html>

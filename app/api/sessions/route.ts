@@ -4,6 +4,7 @@ import { ok, err, serverErr } from '@/lib/api/response'
 import { createSession } from '@/lib/services/session.service'
 import { getActiveRate } from '@/lib/services/rate.service'
 import { generateQRDataUrl } from '@/lib/services/qr.service'
+import { logAction } from '@/lib/services/audit.service'
 import { z } from 'zod'
 
 const CreateSessionSchema = z.object({
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
     )
 
     const qrDataUrl = await generateQRDataUrl(qrCode)
+    await logAction(session.user.id, 'session.created', { sessionId: newSession.id, childId: parsed.data.childId, qrCode })
     return ok({ session: newSession, qrDataUrl, qrCode }, 201)
   } catch (e: unknown) {
     if (e instanceof Error && (e.message === 'QR code not found in inventory' || e.message === 'QR code is already in use')) {

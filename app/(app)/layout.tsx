@@ -47,6 +47,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <Link href="/admin/qr-codes" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
                 QR Codes
               </Link>
+              <Link href="/admin/audit-logs" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+                Audit Logs
+              </Link>
             </>
           )}
         </nav>

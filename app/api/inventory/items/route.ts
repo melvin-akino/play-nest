@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { auth } from '@/lib/config/auth'
 import { ok, err, serverErr } from '@/lib/api/response'
 import { listItems, createItem, CreateItemSchema } from '@/lib/services/inventory.service'
+import { logAction } from '@/lib/services/audit.service'
 
 export async function GET() {
   try {
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) return err(parsed.error.message)
 
     const item = await createItem(parsed.data)
+    await logAction(session.user.id, 'item.created', { itemId: item.id, name: item.name, sku: item.sku })
     return ok(item, 201)
   } catch (e) {
     return serverErr(e)

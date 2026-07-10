@@ -6,6 +6,7 @@ import { users } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcryptjs'
+import { logAction } from '@/lib/services/audit.service'
 import { z } from 'zod'
 
 const CreateStaffSchema = z.object({
@@ -56,6 +57,7 @@ export async function POST(req: NextRequest) {
       role: parsed.data.role,
     }).returning({ id: users.id, name: users.name, email: users.email, role: users.role })
 
+    await logAction(session.user.id, 'staff.created', { staffId: user.id, email: user.email, role: user.role })
     return ok(user, 201)
   } catch (e) {
     return serverErr(e)
@@ -76,6 +78,7 @@ export async function PATCH(req: NextRequest) {
     const [user] = await db.update(users).set(updates).where(eq(users.id, id))
       .returning({ id: users.id, name: users.name, email: users.email, role: users.role, isActive: users.isActive })
 
+    await logAction(session.user.id, 'staff.updated', { staffId: id, changes: updates })
     return ok(user)
   } catch (e) {
     return serverErr(e)

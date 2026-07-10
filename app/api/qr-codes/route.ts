@@ -3,6 +3,7 @@ import { auth } from '@/lib/config/auth'
 import { ok, err, serverErr } from '@/lib/api/response'
 import { listCodes, addManualCode } from '@/lib/services/qrInventory.service'
 import { generateQRDataUrl } from '@/lib/services/qr.service'
+import { logAction } from '@/lib/services/audit.service'
 import { z } from 'zod'
 
 const ManualCodeSchema = z.object({ code: z.string().min(1) })
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) return err(parsed.error.message)
 
     const row = await addManualCode(parsed.data.code)
+    await logAction(session.user.id, 'qr.manualAdded', { code: row.code })
     return ok(row, 201)
   } catch (e: unknown) {
     if (e instanceof Error && (e.message === 'Code already exists' || e.message === 'Code cannot be empty')) {

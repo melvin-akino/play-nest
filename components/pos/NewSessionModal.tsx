@@ -126,7 +126,6 @@ export function NewSessionModal({ onClose, onCreated }: Props) {
         childName: selectedChild.name,
         guardianName: guardian!.name,
         timeIn: json.data.session.timeIn,
-        qrDataUrl: json.data.qrDataUrl,
         qrCode: json.data.qrCode,
         rateName: 'Standard Rate',
       })

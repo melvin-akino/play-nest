@@ -1,38 +1,11 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-
 interface TicketProps {
   childName: string
   guardianName: string
   timeIn: string
-  qrDataUrl: string
   qrCode: string
   rateName: string
-}
-
-export function Ticket({ childName, guardianName, timeIn, qrDataUrl, qrCode, rateName }: TicketProps) {
-  return (
-    <div className="ticket-print hidden print:block" style={{ fontFamily: 'monospace', width: '72mm', padding: '4mm' }}>
-      <div style={{ textAlign: 'center', marginBottom: 8 }}>
-        <div style={{ fontSize: 18, fontWeight: 'bold' }}>🎪 PlayNest</div>
-        <div style={{ fontSize: 11 }}>Mall Playground</div>
-        <hr style={{ margin: '6px 0' }} />
-      </div>
-      <div style={{ fontSize: 12, marginBottom: 4 }}>
-        <div><strong>Child:</strong> {childName}</div>
-        <div><strong>Guardian:</strong> {guardianName}</div>
-        <div><strong>Time In:</strong> {new Date(timeIn).toLocaleString('en-PH')}</div>
-        <div><strong>Rate:</strong> {rateName}</div>
-      </div>
-      <div style={{ textAlign: 'center', margin: '8px 0' }}>
-        {qrDataUrl && <img src={qrDataUrl} alt="QR Code" style={{ width: 120, height: 120 }} />}
-        <div style={{ fontSize: 9, marginTop: 2 }}>{qrCode}</div>
-      </div>
-      <hr style={{ margin: '6px 0' }} />
-      <div style={{ fontSize: 10, textAlign: 'center' }}>Present this ticket upon exit</div>
-    </div>
-  )
 }
 
 export function usePrintTicket() {
@@ -45,7 +18,7 @@ export function usePrintTicket() {
       </head><body>
       <div style="padding:4mm;width:72mm">
         <div style="text-align:center;margin-bottom:8px">
-          <div style="font-size:18px;font-weight:bold">PlayNest</div>
+          <div style="font-size:18px;font-weight:bold">Jungle Gym Play House</div>
           <div style="font-size:11px">Mall Playground</div>
           <hr style="margin:6px 0"/>
         </div>
@@ -56,8 +29,8 @@ export function usePrintTicket() {
           <div><b>Rate:</b> ${props.rateName}</div>
         </div>
         <div style="text-align:center;margin:8px 0">
-          <img src="${props.qrDataUrl}" style="width:120px;height:120px"/>
-          <div style="font-size:9px;margin-top:2px">${props.qrCode}</div>
+          <div style="font-size:10px;color:#555">Wristband Code</div>
+          <div style="font-size:13px;font-weight:bold;letter-spacing:1px">${props.qrCode}</div>
         </div>
         <hr style="margin:6px 0"/>
         <div style="font-size:10px;text-align:center">Present this ticket upon exit</div>

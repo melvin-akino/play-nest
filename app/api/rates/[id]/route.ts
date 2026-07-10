@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { auth } from '@/lib/config/auth'
 import { ok, err, serverErr } from '@/lib/api/response'
 import { setActiveRate, deleteRate } from '@/lib/services/rate.service'
+import { logAction } from '@/lib/services/audit.service'
 
 export async function PATCH(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -11,6 +12,7 @@ export async function PATCH(_req: NextRequest, { params }: { params: Promise<{ i
 
     const { id } = await params
     const rate = await setActiveRate(id)
+    await logAction(session.user.id, 'rate.activated', { rateId: id })
     return ok(rate)
   } catch (e: unknown) {
     if (e instanceof Error && e.message === 'Rate not found') return err(e.message, 404)
@@ -26,6 +28,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
     const { id } = await params
     await deleteRate(id)
+    await logAction(session.user.id, 'rate.deactivated', { rateId: id })
     return ok({ deleted: true })
   } catch (e) {
     return serverErr(e)

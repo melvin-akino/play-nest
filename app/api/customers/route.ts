@@ -8,6 +8,7 @@ import {
   searchGuardians,
   CreateGuardianSchema,
 } from '@/lib/services/customer.service'
+import { logAction } from '@/lib/services/audit.service'
 
 export async function GET(req: NextRequest) {
   try {
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) return err(parsed.error.message)
 
     const guardian = await createGuardian(parsed.data)
+    await logAction(session.user.id, 'guardian.created', { guardianId: guardian.id, name: guardian.name, phone: guardian.phone })
     return ok(guardian, 201)
   } catch (e) {
     return serverErr(e)
