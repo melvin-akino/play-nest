@@ -19,7 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
         <nav className="flex items-center gap-1 flex-1">
           <Link href="/pos" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
-            POS
+            Front Desk
           </Link>
           {isAdmin && (
             <>

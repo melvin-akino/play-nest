@@ -113,7 +113,7 @@ export async function getMonthlySummary(year: number, month: number) {
 
   const rows = await db
     .select({
-      date: sql<string>`date(${sessions.timeIn} / 1000, 'unixepoch')`,
+      date: sql<string>`date(${sessions.timeIn}, 'unixepoch')`,
       sessionCount: sql<number>`count(${sessions.id})`,
       totalRevenue: sql<number>`coalesce(sum(${payments.amount}), 0)`,
     })
@@ -126,8 +126,8 @@ export async function getMonthlySummary(year: number, month: number) {
         lte(sessions.timeIn, end),
       ),
     )
-    .groupBy(sql`date(${sessions.timeIn} / 1000, 'unixepoch')`)
-    .orderBy(sql`date(${sessions.timeIn} / 1000, 'unixepoch')`)
+    .groupBy(sql`date(${sessions.timeIn}, 'unixepoch')`)
+    .orderBy(sql`date(${sessions.timeIn}, 'unixepoch')`)
 
   return rows.map((r) => ({
     date: r.date,
@@ -146,7 +146,7 @@ export async function getPeakHours(year: number, month: number): Promise<HourlyB
 
   const rows = await db
     .select({
-      hour: sql<number>`cast(strftime('%H', ${sessions.timeIn} / 1000, 'unixepoch') as integer)`,
+      hour: sql<number>`cast(strftime('%H', ${sessions.timeIn}, 'unixepoch') as integer)`,
       count: sql<number>`count(*)`,
     })
     .from(sessions)
@@ -157,8 +157,8 @@ export async function getPeakHours(year: number, month: number): Promise<HourlyB
         lte(sessions.timeIn, end),
       ),
     )
-    .groupBy(sql`strftime('%H', ${sessions.timeIn} / 1000, 'unixepoch')`)
-    .orderBy(sql`strftime('%H', ${sessions.timeIn} / 1000, 'unixepoch')`)
+    .groupBy(sql`strftime('%H', ${sessions.timeIn}, 'unixepoch')`)
+    .orderBy(sql`strftime('%H', ${sessions.timeIn}, 'unixepoch')`)
 
   return rows.map((r) => ({ hour: Number(r.hour), count: Number(r.count) }))
 }

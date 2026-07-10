@@ -4,8 +4,10 @@ import { useState } from 'react'
 import { usePrintQrStickers } from '@/components/print/QrStickerSheet'
 import type { QrCode } from '@/lib/db/schema'
 
+type QrCodeWithImage = QrCode & { qrDataUrl: string }
+
 interface Props {
-  initialCodes: QrCode[]
+  initialCodes: QrCodeWithImage[]
 }
 
 export function QrCodeManager({ initialCodes }: Props) {
@@ -17,7 +19,7 @@ export function QrCodeManager({ initialCodes }: Props) {
   const printStickers = usePrintQrStickers()
 
   async function reload() {
-    const res = await fetch('/api/qr-codes')
+    const res = await fetch('/api/qr-codes?withDataUrl=true')
     const json = await res.json()
     if (json.success) setCodes(json.data)
   }
@@ -124,9 +126,13 @@ export function QrCodeManager({ initialCodes }: Props) {
         {codes.length === 0 && <p className="text-gray-400 text-sm p-4">No QR codes yet.</p>}
         {codes.map(c => (
           <div key={c.id} className="flex items-center justify-between px-4 py-3">
-            <div>
-              <div className="font-mono font-medium text-gray-900">{c.code}</div>
-              <div className="text-xs text-gray-500">{new Date(c.createdAt).toLocaleDateString('en-PH')}</div>
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={c.qrDataUrl} alt={c.code} className="w-10 h-10 border border-gray-200 rounded" />
+              <div>
+                <div className="font-mono font-medium text-gray-900">{c.code}</div>
+                <div className="text-xs text-gray-500">{new Date(c.createdAt).toLocaleDateString('en-PH')}</div>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${c.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>

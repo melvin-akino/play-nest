@@ -12,25 +12,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* This app has no dark theme — every card, table, and modal is hardcoded
+   white with gray-900 text. A prefers-color-scheme: dark override here
+   flips --foreground to a light gray, which is unreadable against those
+   hardcoded white backgrounds (login inputs, checkout summary, reports
+   numbers, etc. all rendered as near-invisible text on white). Do not
+   reintroduce it without also auditing every screen for dark-mode support. */
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Form fields sit on white cards throughout the app regardless of system
-   theme, so force readable text/placeholder colors instead of inheriting
-   the dark-mode body foreground (#ededed), which was unreadable on white. */
-input, textarea, select {
-  color: #111827;
-}
-input::placeholder, textarea::placeholder {
-  color: #9ca3af;
 }
