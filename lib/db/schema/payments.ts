@@ -11,11 +11,16 @@ export const payments = sqliteTable('payments', {
   method: text('method', { enum: ['CASH', 'GCASH'] }).notNull(),
   receivedBy: text('received_by').notNull().references(() => users.id),
   paidAt: integer('paid_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  voided: integer('voided', { mode: 'boolean' }).notNull().default(false),
+  voidedReason: text('voided_reason'),
+  voidedBy: text('voided_by').references(() => users.id),
+  voidedAt: integer('voided_at', { mode: 'timestamp' }),
 })
 
 export const paymentsRelations = relations(payments, ({ one }) => ({
   session: one(sessions, { fields: [payments.sessionId], references: [sessions.id] }),
   staff: one(users, { fields: [payments.receivedBy], references: [users.id] }),
+  voidedByUser: one(users, { fields: [payments.voidedBy], references: [users.id] }),
 }))
 
 export type Payment = typeof payments.$inferSelect

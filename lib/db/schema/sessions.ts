@@ -10,7 +10,7 @@ export const sessions = sqliteTable('sessions', {
   childId: text('child_id').notNull().references(() => children.id),
   rateId: text('rate_id').notNull().references(() => rates.id),
   staffId: text('staff_id').notNull().references(() => users.id),
-  status: text('status', { enum: ['PENDING', 'ACTIVE', 'COMPLETED', 'CANCELLED'] }).notNull().default('PENDING'),
+  status: text('status', { enum: ['PENDING', 'ACTIVE', 'COMPLETED', 'CANCELLED', 'VOIDED'] }).notNull().default('PENDING'),
   timeIn: integer('time_in', { mode: 'timestamp' }),
   timeOut: integer('time_out', { mode: 'timestamp' }),
   durationMinutes: integer('duration_minutes'),
@@ -32,4 +32,4 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 
 export type Session = typeof sessions.$inferSelect
 export type NewSession = typeof sessions.$inferInsert
-export type SessionStatus = 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
+export type SessionStatus = 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'VOIDED'
