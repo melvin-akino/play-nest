@@ -15,7 +15,10 @@ export const sessions = sqliteTable('sessions', {
   timeOut: integer('time_out', { mode: 'timestamp' }),
   durationMinutes: integer('duration_minutes'),
   amountDue: integer('amount_due'), // centavos
-  qrCode: text('qr_code').notNull().unique(),
+  // Physical QR sticker code assigned from the qr_codes inventory. Not
+  // unique here — the same sticker is returned to the pool and reused
+  // across many sessions over its lifetime.
+  qrCode: text('qr_code').notNull(),
   // Snapshot of rate at time of session (rate may change later)
   rateSnapshot: text('rate_snapshot', { mode: 'json' }).$type<{ label: string; pricePerHour: number }>(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),

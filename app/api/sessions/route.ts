@@ -8,6 +8,7 @@ import { z } from 'zod'
 
 const CreateSessionSchema = z.object({
   childId: z.string().uuid(),
+  qrCode: z.string().min(1),
 })
 
 export async function POST(req: NextRequest) {
@@ -25,11 +26,15 @@ export async function POST(req: NextRequest) {
       rate.id,
       session.user.id,
       rate,
+      parsed.data.qrCode,
     )
 
     const qrDataUrl = await generateQRDataUrl(qrCode)
     return ok({ session: newSession, qrDataUrl, qrCode }, 201)
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof Error && (e.message === 'QR code not found in inventory' || e.message === 'QR code is already in use')) {
+      return err(e.message, 409)
+    }
     return serverErr(e)
   }
 }

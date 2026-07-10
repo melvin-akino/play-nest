@@ -3,27 +3,36 @@ import { sessions } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
 import { computeBill } from './billing.service'
+import { assignCode, releaseCode } from './qrInventory.service'
 import { logger } from '@/lib/config/logger'
 import type { Rate } from '@/lib/db/schema'
 
-export async function createSession(childId: string, rateId: string, staffId: string, rate: Rate) {
-  const id = uuidv4()
-  const qrCode = uuidv4()
-  const now = new Date()
+export async function createSession(childId: string, rateId: string, staffId: string, rate: Rate, qrCode: string) {
+  // Marks the physical sticker as in-use; throws if it's unknown or already assigned
+  await assignCode(qrCode)
 
-  const [session] = await db.insert(sessions).values({
-    id,
-    childId,
-    rateId,
-    staffId,
-    status: 'ACTIVE',
-    timeIn: now,
-    qrCode,
-    rateSnapshot: { label: rate.label, pricePerHour: rate.pricePerHour },
-  }).returning()
+  try {
+    const id = uuidv4()
+    const now = new Date()
 
-  logger.info({ sessionId: id, childId, staffId }, 'session.created')
-  return { session, qrCode }
+    const [session] = await db.insert(sessions).values({
+      id,
+      childId,
+      rateId,
+      staffId,
+      status: 'ACTIVE',
+      timeIn: now,
+      qrCode,
+      rateSnapshot: { label: rate.label, pricePerHour: rate.pricePerHour },
+    }).returning()
+
+    logger.info({ sessionId: id, childId, staffId, qrCode }, 'session.created')
+    return { session, qrCode }
+  } catch (e) {
+    // Roll back the assignment so the sticker isn't stranded as ASSIGNED
+    await releaseCode(qrCode)
+    throw e
+  }
 }
 
 export async function checkout(sessionId: string) {
@@ -58,6 +67,7 @@ export async function completeSession(
     .returning()
 
   if (!updated) throw new Error('Failed to complete session')
+  await releaseCode(updated.qrCode)
   logger.info({ sessionId, amountCentavos, durationMinutes }, 'session.completed')
   return updated
 }
@@ -75,5 +85,6 @@ export async function cancelSession(sessionId: string) {
     .set({ status: 'CANCELLED' })
     .where(and(eq(sessions.id, sessionId), eq(sessions.status, 'ACTIVE')))
     .returning()
+  if (session) await releaseCode(session.qrCode)
   return session
 }

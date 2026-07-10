@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { usePrintTicket } from '@/components/print/Ticket'
+import { ScanInput } from './ScanInput'
 
-type Step = 'phone' | 'guardian' | 'child' | 'confirm'
+type Step = 'phone' | 'guardian' | 'child' | 'qr' | 'confirm'
 
 interface Guardian {
   id: string
@@ -28,6 +29,8 @@ export function NewSessionModal({ onClose, onCreated }: Props) {
   const [phone, setPhone] = useState('')
   const [guardian, setGuardian] = useState<Guardian | null>(null)
   const [selectedChild, setSelectedChild] = useState<Child | null>(null)
+  const [qrCode, setQrCode] = useState('')
+  const [qrError, setQrError] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -108,16 +111,16 @@ export function NewSessionModal({ onClose, onCreated }: Props) {
   }
 
   async function startSession() {
-    if (!selectedChild) return
-    setLoading(true); setError('')
+    if (!selectedChild || !qrCode) return
+    setLoading(true); setQrError('')
     try {
       const res = await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ childId: selectedChild.id }),
+        body: JSON.stringify({ childId: selectedChild.id, qrCode }),
       })
       const json = await res.json()
-      if (!json.success) { setError(json.error); return }
+      if (!json.success) { setQrError(json.error); return }
 
       printTicket({
         childName: selectedChild.name,
@@ -129,7 +132,7 @@ export function NewSessionModal({ onClose, onCreated }: Props) {
       })
       onCreated()
     } catch {
-      setError('Failed to start session')
+      setQrError('Failed to start session')
     } finally {
       setLoading(false)
     }
@@ -215,9 +218,39 @@ export function NewSessionModal({ onClose, onCreated }: Props) {
                 </div>
               )}
 
-              <button onClick={startSession} disabled={loading || !selectedChild}
+              <button onClick={() => setStep('qr')} disabled={!selectedChild}
                 className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg mt-2">
-                {loading ? 'Starting...' : `Start Session${selectedChild ? ` for ${selectedChild.name}` : ''}`}
+                Continue{selectedChild ? ` with ${selectedChild.name}` : ''}
+              </button>
+            </div>
+          )}
+
+          {step === 'qr' && selectedChild && (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-500">
+                Scan or enter the QR sticker to assign to <strong>{selectedChild.name}</strong>:
+              </p>
+              <ScanInput
+                disabled={loading}
+                onScan={(code) => {
+                  setQrError('')
+                  setQrCode(code)
+                }}
+              />
+              {qrCode && (
+                <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 text-sm">
+                  <span className="font-mono font-medium text-gray-900">{qrCode}</span>
+                  <button onClick={() => setQrCode('')} className="text-red-500 hover:text-red-700 text-xs">Clear</button>
+                </div>
+              )}
+              {qrError && <div className="bg-red-50 text-red-700 text-sm px-3 py-2 rounded-lg">{qrError}</div>}
+
+              <button onClick={startSession} disabled={loading || !qrCode}
+                className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg mt-2">
+                {loading ? 'Starting...' : 'Start Session'}
+              </button>
+              <button onClick={() => setStep('child')} className="w-full text-sm text-gray-500 hover:underline">
+                Back
               </button>
             </div>
           )}
