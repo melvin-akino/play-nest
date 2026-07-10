@@ -5,6 +5,7 @@ import { SessionCard } from './SessionCard'
 import { NewSessionModal } from './NewSessionModal'
 import { CheckoutModal } from './CheckoutModal'
 import { ScanInput } from './ScanInput'
+import { ShopModal } from './ShopModal'
 
 interface ActiveSession {
   id: string
@@ -24,6 +25,7 @@ export function PosBoard({ staffName, staffRole }: Props) {
   const [sessions, setSessions] = useState<ActiveSession[]>([])
   const [showNewSession, setShowNewSession] = useState(false)
   const [checkoutId, setCheckoutId] = useState<string | null>(null)
+  const [showShop, setShowShop] = useState(false)
   const [scanError, setScanError] = useState('')
 
   const loadSessions = useCallback(async () => {
@@ -58,6 +60,12 @@ export function PosBoard({ staffName, staffRole }: Props) {
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-sm transition-colors"
         >
           <span className="text-xl leading-none">+</span> New Session
+        </button>
+        <button
+          onClick={() => setShowShop(true)}
+          className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-sm transition-colors"
+        >
+          Shop
         </button>
         <div className="flex-1">
           <ScanInput onScan={handleScan} disabled={!!checkoutId || showNewSession} />
@@ -112,6 +120,13 @@ export function PosBoard({ staffName, staffRole }: Props) {
           staffName={staffName}
           onClose={() => { setCheckoutId(null); setScanError('') }}
           onCompleted={() => { setCheckoutId(null); loadSessions() }}
+        />
+      )}
+
+      {showShop && (
+        <ShopModal
+          onClose={() => setShowShop(false)}
+          onCompleted={() => setShowShop(false)}
         />
       )}
     </div>

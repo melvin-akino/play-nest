@@ -24,3 +24,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Form fields sit on white cards throughout the app regardless of system
+   theme, so force readable text/placeholder colors instead of inheriting
+   the dark-mode body foreground (#ededed), which was unreadable on white. */
+input, textarea, select {
+  color: #111827;
+}
+input::placeholder, textarea::placeholder {
+  color: #9ca3af;
+}

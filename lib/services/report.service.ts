@@ -1,5 +1,5 @@
 import { db } from '@/lib/db/client'
-import { sessions, payments } from '@/lib/db/schema'
+import { sessions, payments, itemSales, items } from '@/lib/db/schema'
 import { eq, and, sql, gte, lte } from 'drizzle-orm'
 
 export interface DailySummary {
@@ -10,6 +10,17 @@ export interface DailySummary {
   avgDurationMinutes: number
   cashTotal: number
   gcashTotal: number
+  itemSalesRevenueCentavos: number
+  itemSalesRevenueDisplay: string
+  combinedRevenueCentavos: number
+  combinedRevenueDisplay: string
+}
+
+export interface TopItem {
+  itemId: string
+  name: string
+  quantitySold: number
+  revenueCentavos: number
 }
 
 export interface HourlyBucket {
@@ -42,6 +53,15 @@ export async function getDailySummary(date: string): Promise<DailySummary> {
 
   const row = rows[0]
   const total = Number(row?.totalRevenue ?? 0)
+
+  const itemRows = await db
+    .select({ itemRevenue: sql<number>`coalesce(sum(${itemSales.totalAmount}), 0)` })
+    .from(itemSales)
+    .where(and(gte(itemSales.createdAt, start), lte(itemSales.createdAt, end)))
+
+  const itemRevenue = Number(itemRows[0]?.itemRevenue ?? 0)
+  const combined = total + itemRevenue
+
   return {
     date,
     sessionCount: Number(row?.sessionCount ?? 0),
@@ -50,7 +70,37 @@ export async function getDailySummary(date: string): Promise<DailySummary> {
     avgDurationMinutes: Math.round(Number(row?.avgDuration ?? 0)),
     cashTotal: Number(row?.cashTotal ?? 0),
     gcashTotal: Number(row?.gcashTotal ?? 0),
+    itemSalesRevenueCentavos: itemRevenue,
+    itemSalesRevenueDisplay: `₱${(itemRevenue / 100).toFixed(2)}`,
+    combinedRevenueCentavos: combined,
+    combinedRevenueDisplay: `₱${(combined / 100).toFixed(2)}`,
   }
+}
+
+export async function getTopSellingItems(date: string, limit = 5): Promise<TopItem[]> {
+  const start = new Date(`${date}T00:00:00.000Z`)
+  const end = new Date(`${date}T23:59:59.999Z`)
+
+  const rows = await db
+    .select({
+      itemId: itemSales.itemId,
+      name: items.name,
+      quantitySold: sql<number>`coalesce(sum(${itemSales.quantity}), 0)`,
+      revenueCentavos: sql<number>`coalesce(sum(${itemSales.totalAmount}), 0)`,
+    })
+    .from(itemSales)
+    .innerJoin(items, eq(items.id, itemSales.itemId))
+    .where(and(gte(itemSales.createdAt, start), lte(itemSales.createdAt, end)))
+    .groupBy(itemSales.itemId, items.name)
+    .orderBy(sql`sum(${itemSales.totalAmount}) desc`)
+    .limit(limit)
+
+  return rows.map(r => ({
+    itemId: r.itemId,
+    name: r.name,
+    quantitySold: Number(r.quantitySold),
+    revenueCentavos: Number(r.revenueCentavos),
+  }))
 }
 
 export async function getMonthlySummary(year: number, month: number) {

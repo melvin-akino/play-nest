@@ -2,6 +2,7 @@ import { auth } from '@/lib/config/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { SignOutButton } from '@/components/shared/SignOutButton'
+import { ClockInOutButton } from '@/components/shared/ClockInOutButton'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -37,10 +38,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <Link href="/admin/staff" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
                 Staff
               </Link>
+              <Link href="/admin/attendance" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+                Attendance
+              </Link>
+              <Link href="/admin/inventory" className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+                Inventory
+              </Link>
             </>
           )}
         </nav>
         <div className="flex items-center gap-3 text-sm">
+          <ClockInOutButton />
           <span className="text-gray-500">{session.user.name}</span>
           <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">{session.user.role}</span>
           <SignOutButton />
