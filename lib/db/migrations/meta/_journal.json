@@ -43,6 +43,13 @@
       "when": 1783671906272,
       "tag": "0005_brave_gorgon",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1783673435430,
+      "tag": "0006_mean_gunslinger",
+      "breakpoints": true
     }
   ]
 }
