@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { auth } from '@/lib/config/auth'
 import { ok, err, serverErr } from '@/lib/api/response'
 import { sellItems, SellCartSchema } from '@/lib/services/inventory.service'
+import { formatCentavos } from '@/lib/services/billing.service'
 import { logAction } from '@/lib/services/audit.service'
 
 export async function POST(req: NextRequest) {
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) return err(parsed.error.message)
 
     const result = await sellItems(parsed.data, session.user.id)
-    await logAction(session.user.id, 'items.sold', { itemCount: result.sales.length, totalAmount: result.totalAmount, paymentMethod: parsed.data.paymentMethod })
+    await logAction(session.user.id, 'items.sold', { itemCount: result.sales.length, totalAmount: formatCentavos(result.totalAmount), paymentMethod: parsed.data.paymentMethod })
     return ok(result, 201)
   } catch (e: unknown) {
     if (e instanceof Error && (e.message.includes('Insufficient stock') || e.message.includes('not found') || e.message.includes('not active'))) {

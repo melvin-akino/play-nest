@@ -3,6 +3,7 @@ import { auth } from '@/lib/config/auth'
 import { ok, err, serverErr } from '@/lib/api/response'
 import { checkout } from '@/lib/services/session.service'
 import { recordPayment, RecordPaymentSchema } from '@/lib/services/payment.service'
+import { formatCentavos } from '@/lib/services/billing.service'
 import { logAction } from '@/lib/services/audit.service'
 
 // GET: preview bill before payment
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!parsed.success) return err(parsed.error.message)
 
     const result = await recordPayment(parsed.data, session.user.id)
-    await logAction(session.user.id, 'payment.recorded', { sessionId: id, amount: parsed.data.amount, method: parsed.data.method })
+    await logAction(session.user.id, 'payment.recorded', { sessionId: id, amount: formatCentavos(parsed.data.amount), method: parsed.data.method })
     return ok(result)
   } catch (e: unknown) {
     if (e instanceof Error && e.message.includes('not found')) return err(e.message, 404)
