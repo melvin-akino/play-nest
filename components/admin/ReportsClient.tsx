@@ -32,6 +32,7 @@ interface DailySummary {
   sessionCount: number
   totalRevenueDisplay: string
   itemSalesRevenueDisplay: string
+  venueRevenueDisplay: string
   combinedRevenueDisplay: string
   topItems: TopItem[]
 }
@@ -80,7 +81,7 @@ export function ReportsClient() {
       {today && (
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-3">Today&apos;s Sales</h3>
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-4 gap-4 mb-4">
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Playtime</p>
               <p className="text-xl font-bold text-gray-900">{today.totalRevenueDisplay}</p>
@@ -88,6 +89,10 @@ export function ReportsClient() {
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Shop Items</p>
               <p className="text-xl font-bold text-gray-900">{today.itemSalesRevenueDisplay}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Venue Rentals</p>
+              <p className="text-xl font-bold text-gray-900">{today.venueRevenueDisplay}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Combined Total</p>

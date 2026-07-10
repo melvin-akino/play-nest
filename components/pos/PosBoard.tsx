@@ -6,6 +6,7 @@ import { NewSessionModal } from './NewSessionModal'
 import { CheckoutModal } from './CheckoutModal'
 import { ScanInput } from './ScanInput'
 import { ShopModal } from './ShopModal'
+import { VenueBanner } from './VenueBanner'
 
 interface ActiveSession {
   id: string
@@ -53,6 +54,8 @@ export function PosBoard({ staffName, staffRole }: Props) {
 
   return (
     <div className="flex flex-col h-full gap-4">
+      <VenueBanner />
+
       {/* Action bar */}
       <div className="flex gap-3">
         <button

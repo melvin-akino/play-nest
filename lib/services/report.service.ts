@@ -1,5 +1,5 @@
 import { db } from '@/lib/db/client'
-import { sessions, payments, itemSales, items } from '@/lib/db/schema'
+import { sessions, payments, itemSales, items, bookingPayments } from '@/lib/db/schema'
 import { eq, and, sql, gte, lte } from 'drizzle-orm'
 
 export interface DailySummary {
@@ -12,6 +12,8 @@ export interface DailySummary {
   gcashTotal: number
   itemSalesRevenueCentavos: number
   itemSalesRevenueDisplay: string
+  venueRevenueCentavos: number
+  venueRevenueDisplay: string
   combinedRevenueCentavos: number
   combinedRevenueDisplay: string
 }
@@ -60,7 +62,18 @@ export async function getDailySummary(date: string): Promise<DailySummary> {
     .where(and(gte(itemSales.createdAt, start), lte(itemSales.createdAt, end)))
 
   const itemRevenue = Number(itemRows[0]?.itemRevenue ?? 0)
-  const combined = total + itemRevenue
+
+  const venueRows = await db
+    .select({ venueRevenue: sql<number>`coalesce(sum(${bookingPayments.amount}), 0)` })
+    .from(bookingPayments)
+    .where(and(
+      eq(bookingPayments.voided, false),
+      gte(bookingPayments.paidAt, start),
+      lte(bookingPayments.paidAt, end),
+    ))
+
+  const venueRevenue = Number(venueRows[0]?.venueRevenue ?? 0)
+  const combined = total + itemRevenue + venueRevenue
 
   return {
     date,
@@ -72,6 +85,8 @@ export async function getDailySummary(date: string): Promise<DailySummary> {
     gcashTotal: Number(row?.gcashTotal ?? 0),
     itemSalesRevenueCentavos: itemRevenue,
     itemSalesRevenueDisplay: `₱${(itemRevenue / 100).toFixed(2)}`,
+    venueRevenueCentavos: venueRevenue,
+    venueRevenueDisplay: `₱${(venueRevenue / 100).toFixed(2)}`,
     combinedRevenueCentavos: combined,
     combinedRevenueDisplay: `₱${(combined / 100).toFixed(2)}`,
   }
